@@ -1,0 +1,18 @@
+:root {
+  --fifteen-minutes: 18.4px;
+  --minute: calc(1/15*var(--fifteen-minutes));
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+}
+
+.blocks-container {
+  border: 1px solid black;
+  margin-left: 10px;
+}
+
+.blocks-container > div {
+  width: 25px;
+}
