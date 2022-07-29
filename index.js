@@ -19,9 +19,13 @@ let times = [
 ]
 
 function main() {
-  let container = qs('.container')
-  container.appendChild(TimeSchedule())
+  let schedule = TimeSchedule()
+  addSchedule(schedule)
+}
 
+function addSchedule(schedule) {
+  let container = qs('.container')
+  container.appendChild(schedule)
 }
 
 // It is assumed that the system is being used at the beginning of a work period.
@@ -75,6 +79,7 @@ function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, r
     durations.push({minutes: remainingBreaks[i - 1], isBreak: true})
     durations.push({minutes: workDurationsInMinutes[i], isBreak: false})
   }
+  addSchedule(TimeScheduleFromDurations(durations))
   return durations
 }
 
