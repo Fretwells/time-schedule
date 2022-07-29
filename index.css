@@ -1,11 +1,15 @@
 :root {
-  --fifteen-minutes: 18.4px;
+  --fifteen-minutes: 1.1rem;
   --minute: calc(1/15*var(--fifteen-minutes));
 }
 
 .container {
   display: flex;
   flex-direction: row;
+}
+
+.timescale > div {
+  height: var(--fifteen-minutes)
 }
 
 .blocks-container {
