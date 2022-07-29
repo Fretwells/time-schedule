@@ -1,6 +1,5 @@
 /*
 This is a schedule builder, work in progress. Steps to improvement are as follows:
- - Create function to display new time schedule based on given durations
  - Handle edge cases better
  - Create ui forms to input function parameters and display the schedule generated
 */
@@ -30,7 +29,7 @@ function addSchedule(schedule) {
 
 // It is assumed that the system is being used at the beginning of a work period.
 // Remaining breaks is an array of breaks I want to take before I finish work.
-// e.g. the default should be at the beginning of the day [15, 60, 15]
+// e.g. the default should be at the beginning of the day [15, 60, 15, 15]
 // If a schedule cannot be made that has no work periods longer than 1.5 hrs and also only takes the breaks allotted, then this function will alert the difference between remaining work and scheduled work.
 function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, remainingBreaks) {
 
@@ -42,7 +41,7 @@ function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, r
     )
   }
   if (startTime !== currentTime) {
-    durations.concat([
+    durations = durations.concat([
       {minutes: minutesWorkDone, isBreak: false},
       {minutes: minutesBreakTaken, isBreak: true},
     ])
