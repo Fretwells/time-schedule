@@ -1,8 +1,8 @@
 /*
-This is a quick and dirty schedule builder. Before any modifications are made to this program, one
-should refactor it considerably. Namely, it would be better to have a TimeScheduleFromDurations
-function that takes in an array of durations with booleans for if they denote a break or not. Then,
-calculateRemainingSchedule would be greatly simplified.
+This is a schedule builder, work in progress. Steps to improvement are as follows:
+ - Create function to display new time schedule based on given durations
+ - Handle edge cases better
+ - Create ui forms to input function parameters and display the schedule generated
 */
 const SCHEDULE_MIN = 600;
 
@@ -28,66 +28,51 @@ function main() {
 // Remaining breaks is an array of breaks I want to take before I finish work.
 // e.g. the default should be at the beginning of the day [15, 60, 15]
 // If a schedule cannot be made that has no work periods longer than 1.5 hrs and also only takes the breaks allotted, then this function will alert the difference between remaining work and scheduled work.
-function calculateRemainingSchedule(startTime, breakTimeTaken, currentTime, remainingBreaks) {
+function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, remainingBreaks) {
 
-  let workTimeDone = parseTime(currentTime) - parseTime(startTime) - breakTimeTaken
-  times = [
-    {start: startTime, stop: SCHEDULE_MIN + unparseDuration(parseTime(startTime) + workTimeDone), isBreak: false},
-    {
-      start: startTime + unparseDuration(workTimeDone),
-      stop: currentTime,
-      isBreak: true
-    }
-  ]
+  let minutesWorkDone = parseTime(currentTime) - parseTime(startTime) - minutesBreakTaken
+  let durations = []
+  if (startTime != currentTime) {
+  durations.concat([
+    {minutes: parseTime(startTime), isBreak: true},
+    {minutes: minutesWorkDone, isBreak: false},
+    {minutes: minutesBreakTaken, isBreak: true},
+  ])
+  }
 
   const NUM_WORK_BLOCKS = 1 + remainingBreaks.length
-  let remainingWorkTime = 6.5 * 60 - workTimeDone
-  let avgWorkTime = remainingWorkTime / NUM_WORK_BLOCKS
-  let fifteenBlocks = Math.trunc(avgWorkTime / 15)
+  let remainingMinutesOfWork = 6.5 * 60 - minutesWorkDone
+  let avgMinutesPerWorkBlock = remainingMinutesOfWork / NUM_WORK_BLOCKS
+  let fifteenBlocks = Math.trunc(avgMinutesPerWorkBlock / 15)
   // Set each work period to avg fifteen blocks - 1, add fifteen blocks in a triangular fashion while keeping each work period below 1.5 hours until work quota is met
-  let workTimes = Array(NUM_WORK_BLOCKS).fill(fifteenBlocks - 1)
-  let sumOfWorkAccounted = workTimes.reduce((a, b) => a + b) * 15
-  // 
-  for (let i = 0; i < workTimes.length; i++) {
-    for (let j = 0; j < i; j++) {
-      if (sumOfWorkAccounted >= remainingWorkTime) {
-        break;
-      }
-      if (workTimes[j] * 15 <= 75) {
-        workTimes[j] += 1
-        sumOfWorkAccounted += 15
+  let workDurationsInMinutes = Array(NUM_WORK_BLOCKS).fill((fifteenBlocks - 1) * 15)
+  let sumOfWorkAccounted = workDurationsInMinutes.reduce((a, b) => a + b)
+  // While all work blocks are less than 1.5 hrs
+  // while (sumOfWorkAccounted / NUM_WORK_BLOCKS < 90) {
+    for (let i = NUM_WORK_BLOCKS - 1; i >= 0; i--) {
+      for (let j = 0; j < i; j++) {
+        if (sumOfWorkAccounted >= remainingMinutesOfWork) {
+          break;
+        }
+        if (workDurationsInMinutes[j] <= 75) {
+          workDurationsInMinutes[j] += 15
+          sumOfWorkAccounted += 15
+        }
       }
     }
+  // }
+  if (sumOfWorkAccounted != remainingMinutesOfWork) {
+    window.alert(`Malformed schedule! Remaining work = ${remainingMinutesOfWork}, work accounted in schedule = ${sumOfWorkAccounted}`)
   }
-  if (sumOfWorkAccounted != remainingWorkTime) {
-    window.alert(`remaining work = ${remainingWorkTime}, work accounted in schedule = ${sumOfWorkAccounted}`)
-  }
-  let startOfRemainingSched = currentTime
-  let workDuration = workTimes[0] * 15
-  workTimes = workTimes.slice(1)
-  times.push({
-    start: startOfRemainingSched,
-    stop: startOfRemainingSched + unparseDuration(workDuration),
-    isBreak: false
-  })
-  while (workTimes.length > 0) {
-    let breakDuration = remainingBreaks[0]
-    remainingBreaks = remainingBreaks.slice(1)
-    times.push({
-      start: times[times.length - 1].stop,
-      stop: SCHEDULE_MIN + unparseDuration(parseTime(times[times.length - 1].stop) + breakDuration),
-      isBreak: true
-    })
 
-    workDuration = workTimes[0] * 15
-    workTimes = workTimes.slice(1)
-    times.push({
-      start: times[times.length - 1].stop,
-      stop: SCHEDULE_MIN + unparseDuration(parseTime(times[times.length - 1].stop) + workDuration),
-      isBreak: false
-    })
+  let startOfRemainingSched = currentTime
+  durations.push({minutes: workDurationsInMinutes[0], isBreak: false})
+
+  for (i = 1; i < workDurationsInMinutes.length; i++) {
+    durations.push({minutes: remainingBreaks[i - 1], isBreak: true})
+    durations.push({minutes: workDurationsInMinutes[i], isBreak: false})
   }
-  console.log(times)
+  return durations
 }
 
 function TimeScheduleFromDurations(durations) {
@@ -111,6 +96,7 @@ function TimeSchedule() {
 }
 
 function Block(duration, isBreak) {
+  // Objective HTML:
   // <div style='height: calc(${duration}*var(--minute)); background-color: ${color}'></div>
   let block = create('div')
   let color = isBreak ? 'white' : 'blue'
