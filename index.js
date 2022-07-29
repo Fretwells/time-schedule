@@ -71,7 +71,7 @@ function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, r
 
   durations.push({minutes: workDurationsInMinutes[0], isBreak: false})
 
-  for (i = 1; i < workDurationsInMinutes.length; i++) {
+  for (let i = 1; i < workDurationsInMinutes.length; i++) {
     durations.push({minutes: remainingBreaks[i - 1], isBreak: true})
     durations.push({minutes: workDurationsInMinutes[i], isBreak: false})
   }
@@ -107,7 +107,7 @@ function Block(duration, isBreak) {
   return block
 }
 
-// Returns minutes since SCHEDULE_MIN when given hh:mm format time. Note: 24 hour clock is assumed.
+// Returns number of minutes since SCHEDULE_MIN when given hh:mm format time. Note: 24-hour clock is assumed.
 function parseTime(time) {
   let minHour = Math.trunc(SCHEDULE_MIN / 100)
   let minMinutes = SCHEDULE_MIN - minHour * 100
@@ -116,11 +116,11 @@ function parseTime(time) {
   return hour * 60 + minutes
 }
 
-// Changes a number of minutes into a hh:mm format: e.g. 90min => 130
-function unparseDuration(durationInMinutes) {
-  hours = Math.trunc(durationInMinutes / 60)
-  minutes = durationInMinutes - 60 * hours
-  return 100*hours + minutes
+// Changes a number of minutes into a hh:mm format (it is still a duration): e.g. 90min => 130
+function minutesToHHMMDuration(durationInMinutes) {
+  let hours = Math.trunc(durationInMinutes / 60)
+  let minutes = durationInMinutes - 60 * hours
+  return 100 * hours + minutes
 }
 
 function qs(selector) {return document.querySelector(selector)}
