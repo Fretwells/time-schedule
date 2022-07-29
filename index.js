@@ -6,7 +6,7 @@ This is a schedule builder, work in progress. Steps to improvement are as follow
 */
 const SCHEDULE_MIN = 600;
 
-var times = [ 
+let times = [
   {start: 800, stop: 930, isBreak: false},
   {start: 930, stop: 945, isBreak: true},
   {start: 945, stop: 1115, isBreak: false},
@@ -32,12 +32,16 @@ function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, r
 
   let minutesWorkDone = parseTime(currentTime) - parseTime(startTime) - minutesBreakTaken
   let durations = []
-  if (startTime != currentTime) {
-  durations.concat([
-    {minutes: parseTime(startTime), isBreak: true},
-    {minutes: minutesWorkDone, isBreak: false},
-    {minutes: minutesBreakTaken, isBreak: true},
-  ])
+  if (startTime !== SCHEDULE_MIN) {
+    durations.push(
+      {minutes: parseTime(startTime), isBreak: true}
+    )
+  }
+  if (startTime !== currentTime) {
+    durations.concat([
+      {minutes: minutesWorkDone, isBreak: false},
+      {minutes: minutesBreakTaken, isBreak: true},
+    ])
   }
 
   const NUM_WORK_BLOCKS = 1 + remainingBreaks.length
@@ -61,11 +65,10 @@ function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, r
       }
     }
   // }
-  if (sumOfWorkAccounted != remainingMinutesOfWork) {
+  if (sumOfWorkAccounted !== remainingMinutesOfWork) {
     window.alert(`Malformed schedule! Remaining work = ${remainingMinutesOfWork}, work accounted in schedule = ${sumOfWorkAccounted}`)
   }
 
-  let startOfRemainingSched = currentTime
   durations.push({minutes: workDurationsInMinutes[0], isBreak: false})
 
   for (i = 1; i < workDurationsInMinutes.length; i++) {
