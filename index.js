@@ -90,16 +90,24 @@ function calculateRemainingSchedule(startTime, breakTimeTaken, currentTime, rema
   console.log(times)
 }
 
-function TimeSchedule() {
+function TimeScheduleFromDurations(durations) {
   let blocksContainer = create('div')
   blocksContainer.classList.add('blocks-container')
-  if (times[0].start > SCHEDULE_MIN) {
-    blocksContainer.appendChild(Block(parseTime(times[0].start) - parseTime(SCHEDULE_MIN), true))
-  }
-  times.forEach((time) => {
-    blocksContainer.appendChild(Block(parseTime(time.stop) - parseTime(time.start), time.isBreak))
+  durations.forEach((duration) => {
+    blocksContainer.appendChild(Block(duration.minutes, duration.isBreak))
   })
   return blocksContainer
+}
+
+function TimeSchedule() {
+  let durations = []
+  if (times[0].start > SCHEDULE_MIN) {
+    durations.push({ minutes: parseTime(times[0].start) - parseTime(SCHEDULE_MIN), isBreak: true })
+  }
+  times.forEach((time) => {
+    durations.push({ minutes: parseTime(time.stop) - parseTime(time.start), isBreak: time.isBreak })
+  })
+  return TimeScheduleFromDurations(durations)
 }
 
 function Block(duration, isBreak) {
