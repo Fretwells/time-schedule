@@ -55,11 +55,12 @@ function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, r
   let workDurationsInMinutes = Array(NUM_WORK_BLOCKS).fill((fifteenBlocks - 1) * 15)
   let sumOfWorkAccounted = workDurationsInMinutes.reduce((a, b) => a + b)
   // While all work blocks are less than 1.5 hrs
-  // while (sumOfWorkAccounted / NUM_WORK_BLOCKS < 90) {
-    for (let i = NUM_WORK_BLOCKS - 1; i >= 0; i--) {
+  outerLoop:
+  while (sumOfWorkAccounted / NUM_WORK_BLOCKS < 90) {
+    for (let i = NUM_WORK_BLOCKS; i >= 0; i--) {
       for (let j = 0; j < i; j++) {
         if (sumOfWorkAccounted >= remainingMinutesOfWork) {
-          break;
+          break outerLoop;
         }
         if (workDurationsInMinutes[j] <= 75) {
           workDurationsInMinutes[j] += 15
@@ -67,7 +68,7 @@ function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, r
         }
       }
     }
-  // }
+  }
   if (sumOfWorkAccounted !== remainingMinutesOfWork) {
     window.alert(`Malformed schedule! Remaining work = ${remainingMinutesOfWork}, work accounted in schedule = ${sumOfWorkAccounted}`)
   }
