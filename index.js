@@ -21,7 +21,25 @@ function main() {
   let schedule = TimeSchedule()
   addSchedule(schedule)
 
+  let breakButtons = [
+    [ 15, qs('#add-break-15') ],
+    [ 30, qs('#add-break-30') ],
+    [ 45, qs('#add-break-45') ],
+    [ 60, qs('#add-break-60') ],
+  ]
 
+  breakButtons.forEach(( [duration, node] ) => {
+    node.addEventListener('click', (event) => {
+      event.preventDefault()
+      addBreakOfDuration(duration)
+    })
+  })
+}
+
+function addBreakOfDuration(minutes) {
+  let form = qs('form')
+  let block = Block(minutes, false)
+  form.appendChild(block)
 }
 
 function addSchedule(schedule) {
@@ -111,6 +129,7 @@ function Block(duration, isBreak) {
   let block = create('div')
   let color = isBreak ? 'white' : 'blue'
   block.style = `height: calc(${duration}*var(--minute)); background-color: ${color};`
+  block.classList.add('time-block')
   return block
 }
 
