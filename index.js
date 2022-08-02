@@ -22,8 +22,7 @@ let breaks = [15, 60, 15, 15]
 function main() {
   let schedule = TimeSchedule()
   addSchedule(schedule)
-  let form = qs('form')
-  breaks.forEach(minutes => form.appendChild(Block(minutes, false)))
+  breaks.forEach(minutes => addBreakOfDuration(minutes))
 
   let breakButtons = [
     [ 15, id('add-break-15') ],
