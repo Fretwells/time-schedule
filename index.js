@@ -19,7 +19,7 @@ var times = [
 ]
 
 function main() {
-  let container = qs('.container')
+  let container = qs('.schedules')
   container.appendChild(TimeSchedule())
 
 }

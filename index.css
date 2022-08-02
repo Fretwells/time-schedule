@@ -3,7 +3,7 @@
   --minute: calc(1/15*var(--fifteen-minutes));
 }
 
-.container {
+.schedules {
   display: flex;
   flex-direction: row;
 }
@@ -19,4 +19,16 @@
 
 .blocks-container > div {
   width: 25px;
+}
+
+main {
+  display: flex;
+  width: 90%;
+  margin: auto;
+}
+
+form {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
 }

@@ -1,11 +1,12 @@
-<html>
+<html lang="en">
   <head>
     <link rel='stylesheet' href='./index.css'>
     <script src='./index.js'></script>
+    <title>Time Schedule Generator</title>
   </head>
   <body>
     <main>
-      <div class='container'>
+      <div class='schedules'>
         <div class='timescale'>
           <!-- Times -->
           <div>600</div>
@@ -74,6 +75,21 @@
           <!-- time blocks and labels -->
         </div>
       </div>
+      <form>
+        <label for="start-time">Start Time</label>
+        <input id="start-time" type="number" />
+
+        <label for="current-time">Current Time</label>
+        <input id="current-time" type="number" />
+
+        <label for="break-minutes-taken">Minutes of Break Taken</label>
+        <input id="break-minutes-taken" type="number" />
+
+        <button id="add-break-15">Add 15min break</button>
+        <button id="add-break-30">Add 30min break</button>
+        <button id="add-break-45">Add 45min break</button>
+        <button id="add-break-60">Add 60min break</button>
+      </form>
     </main>
   </body>
 </html>
