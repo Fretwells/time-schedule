@@ -35,7 +35,14 @@ function main() {
     node.addEventListener('click', (event) => {
       event.preventDefault()
       addBreakOfDuration(duration)
+      breaks.push(duration)
     })
+  })
+
+  id('clear-breaks').addEventListener('click', (event) => {
+    event.preventDefault()
+    breaks = []
+    id('breaks-preview').innerHTML = ''
   })
 
   id('add-schedule').addEventListener('click', (event) => {
