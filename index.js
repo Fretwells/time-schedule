@@ -17,15 +17,19 @@ let times = [
   {start: 1515, stop: 1615, isBreak: false},
 ]
 
+let breaks = [15, 60, 15, 15]
+
 function main() {
   let schedule = TimeSchedule()
   addSchedule(schedule)
+  let form = qs('form')
+  breaks.forEach(minutes => form.appendChild(Block(minutes, false)))
 
   let breakButtons = [
-    [ 15, qs('#add-break-15') ],
-    [ 30, qs('#add-break-30') ],
-    [ 45, qs('#add-break-45') ],
-    [ 60, qs('#add-break-60') ],
+    [ 15, id('add-break-15') ],
+    [ 30, id('add-break-30') ],
+    [ 45, id('add-break-45') ],
+    [ 60, id('add-break-60') ],
   ]
 
   breakButtons.forEach(( [duration, node] ) => {
@@ -34,12 +38,22 @@ function main() {
       addBreakOfDuration(duration)
     })
   })
+
+  id('add-schedule').addEventListener('click', (event) => {
+    event.preventDefault()
+    calculateRemainingSchedule(
+      id('start-time').value,
+      id('break-minutes-taken').value,
+      id('current-time').value,
+      breaks
+    )
+  })
 }
 
 function addBreakOfDuration(minutes) {
-  let form = qs('form')
+  let breaksSection = id('breaks-preview')
   let block = Block(minutes, false)
-  form.appendChild(block)
+  breaksSection.appendChild(block)
 }
 
 function addSchedule(schedule) {
@@ -149,6 +163,7 @@ function minutesToHHMMDuration(durationInMinutes) {
   return 100 * hours + minutes
 }
 
+function id(elementID) {return document.getElementById(elementID)}
 function qs(selector) {return document.querySelector(selector)}
 function qsa(selector) {return document.querySelectorAll(selector)}
 function create(element) {return document.createElement(element)}
