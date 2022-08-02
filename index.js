@@ -1,12 +1,11 @@
 /*
 This is a schedule builder, work in progress. Steps to improvement are as follows:
- - Create function to display new time schedule based on given durations
  - Handle edge cases better
  - Create ui forms to input function parameters and display the schedule generated
 */
 const SCHEDULE_MIN = 600;
 
-var times = [ 
+let times = [
   {start: 800, stop: 930, isBreak: false},
   {start: 930, stop: 945, isBreak: true},
   {start: 945, stop: 1115, isBreak: false},
@@ -19,25 +18,35 @@ var times = [
 ]
 
 function main() {
-  let container = qs('.schedules')
-  container.appendChild(TimeSchedule())
+  let schedule = TimeSchedule()
+  addSchedule(schedule)
 
+
+}
+
+function addSchedule(schedule) {
+  let container = qs('.schedules')
+  container.appendChild(schedule)
 }
 
 // It is assumed that the system is being used at the beginning of a work period.
 // Remaining breaks is an array of breaks I want to take before I finish work.
-// e.g. the default should be at the beginning of the day [15, 60, 15]
+// e.g. the default should be at the beginning of the day [15, 60, 15, 15]
 // If a schedule cannot be made that has no work periods longer than 1.5 hrs and also only takes the breaks allotted, then this function will alert the difference between remaining work and scheduled work.
 function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, remainingBreaks) {
 
   let minutesWorkDone = parseTime(currentTime) - parseTime(startTime) - minutesBreakTaken
   let durations = []
-  if (startTime != currentTime) {
-  durations.concat([
-    {minutes: parseTime(startTime), isBreak: true},
-    {minutes: minutesWorkDone, isBreak: false},
-    {minutes: minutesBreakTaken, isBreak: true},
-  ])
+  if (startTime !== SCHEDULE_MIN) {
+    durations.push(
+      {minutes: parseTime(startTime), isBreak: true}
+    )
+  }
+  if (startTime !== currentTime) {
+    durations = durations.concat([
+      {minutes: minutesWorkDone, isBreak: false},
+      {minutes: minutesBreakTaken, isBreak: true},
+    ])
   }
 
   const NUM_WORK_BLOCKS = 1 + remainingBreaks.length
@@ -48,11 +57,12 @@ function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, r
   let workDurationsInMinutes = Array(NUM_WORK_BLOCKS).fill((fifteenBlocks - 1) * 15)
   let sumOfWorkAccounted = workDurationsInMinutes.reduce((a, b) => a + b)
   // While all work blocks are less than 1.5 hrs
-  // while (sumOfWorkAccounted / NUM_WORK_BLOCKS < 90) {
-    for (let i = NUM_WORK_BLOCKS - 1; i >= 0; i--) {
+  outerLoop:
+  while (sumOfWorkAccounted / NUM_WORK_BLOCKS < 90) {
+    for (let i = NUM_WORK_BLOCKS; i >= 0; i--) {
       for (let j = 0; j < i; j++) {
         if (sumOfWorkAccounted >= remainingMinutesOfWork) {
-          break;
+          break outerLoop;
         }
         if (workDurationsInMinutes[j] <= 75) {
           workDurationsInMinutes[j] += 15
@@ -60,18 +70,18 @@ function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, r
         }
       }
     }
-  // }
-  if (sumOfWorkAccounted != remainingMinutesOfWork) {
+  }
+  if (sumOfWorkAccounted !== remainingMinutesOfWork) {
     window.alert(`Malformed schedule! Remaining work = ${remainingMinutesOfWork}, work accounted in schedule = ${sumOfWorkAccounted}`)
   }
 
-  let startOfRemainingSched = currentTime
   durations.push({minutes: workDurationsInMinutes[0], isBreak: false})
 
-  for (i = 1; i < workDurationsInMinutes.length; i++) {
+  for (let i = 1; i < workDurationsInMinutes.length; i++) {
     durations.push({minutes: remainingBreaks[i - 1], isBreak: true})
     durations.push({minutes: workDurationsInMinutes[i], isBreak: false})
   }
+  addSchedule(TimeScheduleFromDurations(durations))
   return durations
 }
 
@@ -104,7 +114,7 @@ function Block(duration, isBreak) {
   return block
 }
 
-// Returns minutes since SCHEDULE_MIN when given hh:mm format time. Note: 24 hour clock is assumed.
+// Returns number of minutes since SCHEDULE_MIN when given hh:mm format time. Note: 24-hour clock is assumed.
 function parseTime(time) {
   let minHour = Math.trunc(SCHEDULE_MIN / 100)
   let minMinutes = SCHEDULE_MIN - minHour * 100
@@ -113,11 +123,11 @@ function parseTime(time) {
   return hour * 60 + minutes
 }
 
-// Changes a number of minutes into a hh:mm format: e.g. 90min => 130
-function unparseDuration(durationInMinutes) {
-  hours = Math.trunc(durationInMinutes / 60)
-  minutes = durationInMinutes - 60 * hours
-  return 100*hours + minutes
+// Changes a number of minutes into a hh:mm format (it is still a duration): e.g. 90min => 130
+function minutesToHHMMDuration(durationInMinutes) {
+  let hours = Math.trunc(durationInMinutes / 60)
+  let minutes = durationInMinutes - 60 * hours
+  return 100 * hours + minutes
 }
 
 function qs(selector) {return document.querySelector(selector)}
