@@ -27,12 +27,12 @@ main {
   margin: auto;
 }
 
-form {
+section {
   margin-left: auto;
   display: flex;
   flex-direction: column;
 }
 
-form .time-block {
+section .time-block {
   border: 1px solid black;
 }

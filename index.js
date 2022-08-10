@@ -54,6 +54,20 @@ function main() {
       breaks
     )
   })
+
+  id('start-time').addEventListener('change', (event) => {
+    let currentTime = id('current-time')
+    if (Number(currentTime.value) < Number(event.target.value)) {
+      currentTime.value = event.target.value
+    }
+  })
+
+  id('current-time').addEventListener('change', (event) => {
+    let startTime = id('start-time')
+    if (Number(startTime.value) > Number(event.target.value)) {
+      startTime.value = event.target.value
+    }
+  })
 }
 
 function addBreakOfDuration(minutes) {
