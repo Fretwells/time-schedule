@@ -8,6 +8,18 @@
   flex-direction: row;
 }
 
+#selected-schedule {
+  order: -1;
+}
+
+#selected-schedule > .time-block.work {
+  background-color: crimson;
+}
+
+.timescale {
+  order: -2;
+}
+
 .timescale > div {
   height: var(--fifteen-minutes)
 }
@@ -17,8 +29,13 @@
   margin-left: 10px;
 }
 
-.blocks-container > div {
+.time-block {
+  background-color: white;
   width: 25px;
+}
+
+.time-block.work {
+  background-color: blue;
 }
 
 main {

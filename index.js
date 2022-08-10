@@ -1,3 +1,4 @@
+'use strict';
 /*
 This is a schedule builder, work in progress. Steps to improvement are as follows:
  - Handle edge cases better
@@ -79,6 +80,12 @@ function addBreakOfDuration(minutes) {
 function addSchedule(schedule) {
   let container = qs('.schedules')
   container.appendChild(schedule)
+
+  container.lastChild.addEventListener('click', (event) => {
+    id('selected-schedule')?.removeAttribute('id')
+    let scheduleSelected = event.target.closest('.blocks-container')
+    scheduleSelected.id = 'selected-schedule'
+  })
 }
 
 // It is assumed that the system is being used at the beginning of a work period.
@@ -161,8 +168,8 @@ function Block(duration, isBreak) {
   // Objective HTML:
   // <div style='height: calc(${duration}*var(--minute)); background-color: ${color}'></div>
   let block = create('div')
-  let color = isBreak ? 'white' : 'blue'
-  block.style = `height: calc(${duration}*var(--minute)); background-color: ${color};`
+  block.style = `height: calc(${duration}*var(--minute));`
+  if (!isBreak) block.classList.add('work')
   block.classList.add('time-block')
   return block
 }
