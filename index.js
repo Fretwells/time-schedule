@@ -5,6 +5,7 @@ This is a schedule builder, work in progress. Steps to improvement are as follow
  - Create ui forms to input function parameters and display the schedule generated
 */
 const SCHEDULE_MIN = 600;
+const MINUTES_WORK_IN_DAY = 6.5 * 60
 
 let times = [
   {start: 800, stop: 930, isBreak: false},
@@ -92,9 +93,23 @@ function addSchedule(schedule) {
 // Remaining breaks is an array of breaks I want to take before I finish work.
 // e.g. the default should be at the beginning of the day [15, 60, 15, 15]
 // If a schedule cannot be made that has no work periods longer than 1.5 hrs and also only takes the breaks allotted, then this function will alert the difference between remaining work and scheduled work.
+// If the given minutesBreakTaken is negative, then it is interpreted as the minutes of work remaining to be done (it is
+// made positive, of course).
 function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, remainingBreaks) {
 
-  let minutesWorkDone = parseTime(currentTime) - parseTime(startTime) - minutesBreakTaken
+  let minutesWorkDone;
+  if (minutesBreakTaken < 0) {
+    // Negative minutesBreakTaken are defined as the amount of work remaining to do.
+    let minutesWorkRemaining = -minutesBreakTaken
+    minutesWorkDone = MINUTES_WORK_IN_DAY - minutesWorkRemaining
+
+    // Now that we have minutesWorkDone, we have enough info to calculate the actual minutesBreakTaken.
+    minutesBreakTaken = parseTime(currentTime) - parseTime(startTime) - minutesWorkDone
+  } else {
+    minutesWorkDone = parseTime(currentTime) - parseTime(startTime) - minutesBreakTaken
+  }
+
+
   let durations = []
   if (startTime !== SCHEDULE_MIN) {
     durations.push(
@@ -109,7 +124,7 @@ function calculateRemainingSchedule(startTime, minutesBreakTaken, currentTime, r
   }
 
   const NUM_WORK_BLOCKS = 1 + remainingBreaks.length
-  let remainingMinutesOfWork = 6.5 * 60 - minutesWorkDone
+  let remainingMinutesOfWork = MINUTES_WORK_IN_DAY - minutesWorkDone
   let avgMinutesPerWorkBlock = remainingMinutesOfWork / NUM_WORK_BLOCKS
   let fifteenBlocks = Math.trunc(avgMinutesPerWorkBlock / 15)
   // Set each work period to avg fifteen blocks - 1, add fifteen blocks in a triangular fashion while keeping each work period below 1.5 hours until work quota is met
